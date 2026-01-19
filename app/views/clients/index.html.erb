@@ -1,0 +1,59 @@
+<div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
+  <div>
+    <h1 class="text-4xl font-black text-white italic tracking-tighter uppercase">Base de <span class="text-orange-500">Clientes</span></h1>
+    <p class="text-zinc-500 text-sm">Gerencie o cadastro e histórico dos seus consumidores.</p>
+  </div>
+  <%= link_to 'NOVO CLIENTE', new_client_path, class: "bg-orange-600 hover:bg-orange-500 text-white font-black py-3 px-8 rounded-2xl transition-all shadow-[0_0_20px_rgba(234,88,12,0.3)] italic tracking-tighter" %>
+</div>
+
+<div class="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl">
+  <table class="w-full text-left border-collapse">
+    <thead>
+      <tr class="bg-zinc-800/50 text-zinc-400 text-[10px] uppercase tracking-widest">
+        <th class="p-6 border-b border-zinc-800 font-bold">Cliente / CPF</th>
+        <th class="p-6 border-b border-zinc-800 font-bold">Contato</th>
+        <th class="p-6 border-b border-zinc-800 font-bold">Localização</th>
+        <th class="p-6 text-right border-b border-zinc-800 font-bold">Ações</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-zinc-800">
+      <% @clients.each do |client| %>
+        <tr class="hover:bg-zinc-800/30 transition-colors group">
+          <td class="p-6">
+            <div class="text-white font-bold group-hover:text-orange-400 transition-colors"><%= client.name %></div>
+            <div class="text-[10px] text-zinc-600 font-mono"><%= client.cpf.present? ? client.cpf : "SEM CPF" %></div>
+          </td>
+          <td class="p-6">
+            <div class="text-zinc-300 text-sm font-medium"><%= client.phone.present? ? client.phone : "---" %></div>
+          </td>
+          <td class="p-6">
+            <div class="text-zinc-400 text-xs italic"><%= client.city %> - <%= client.state %></div>
+            <div class="text-[10px] text-zinc-600 uppercase tracking-tighter"><%= client.neighborhood %></div>
+          </td>
+          <td class="p-6 text-right">
+            <div class="flex justify-end gap-2">
+              <%= link_to client, class: "inline-flex items-center justify-center w-10 h-10 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white rounded-xl transition-all border border-zinc-700" do %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              <% end %>
+
+              <%= link_to edit_client_path(client), class: "inline-flex items-center justify-center w-10 h-10 bg-zinc-800 hover:bg-orange-600 text-zinc-400 hover:text-white rounded-xl transition-all border border-zinc-700" do %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <% if @clients.empty? %>
+    <div class="p-20 text-center italic text-zinc-600">
+      Nenhum cliente cadastrado ainda.
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,222 @@
+<div class="flex flex-col md:flex-row gap-6 h-[calc(100vh-120px)]" data-controller="keyboard-shortcuts">
+  
+  <div class="md:w-1/3 flex flex-col gap-6">
+    <div class="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+      <div class="absolute -top-10 -left-10 w-32 h-32 bg-orange-600/10 blur-[50px] rounded-full"></div>
+      
+      <div class="flex justify-between items-start mb-6 relative">
+        <h2 class="text-orange-500 font-black text-xs uppercase tracking-[0.2em] italic">Terminal de Venda</h2>
+        <span class="text-[9px] bg-zinc-800 text-zinc-400 px-2 py-1 rounded border border-zinc-700 font-bold uppercase">
+          Operador: <%= current_user&.name || "Sistema" %>
+        </span>
+      </div>
+      
+      <%= form_with url: cart_add_path, method: :post, id: "add_product_form", class: "space-y-6 relative" do |f| %>
+        <%# CAMPO QUE GARANTE QUE O CLIENTE SEJA SALVO AO ADICIONAR PRODUTO %>
+        <%= f.hidden_field :client_id, id: "hidden_client_id_for_bip", value: session[:selected_client_id] %>
+
+        <div class="relative group">
+          <label class="block text-zinc-500 text-[10px] font-bold mb-2 uppercase tracking-widest group-focus-within:text-orange-500 transition-colors italic">Entrada de Produto</label>
+          
+          <%# SUBSTITUÍDO POR SELECT INTELIGENTE %>
+          <%= f.collection_select :barcode_or_name, @products, :id, 
+              ->(p) { "#{p.name} | #{number_to_currency(p.price)} | Est: #{p.stock_quantity}" }, 
+              { include_blank: "PESQUISAR PRODUTO..." }, 
+              { 
+                id: "product_search_select",
+                class: "block w-full bg-zinc-950 border-2 border-zinc-800 rounded-2xl text-white text-xl p-4 focus:ring-0 focus:border-orange-600 transition-all font-bold" 
+              } %>
+
+          <div class="absolute right-4 top-[42px] text-zinc-800 pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+      <% end %>
+      
+      <div class="mt-12 p-5 bg-zinc-950 rounded-2xl border border-zinc-800 text-center relative">
+        <p class="text-zinc-500 text-[10px] uppercase font-bold tracking-widest mb-2 italic">Cliente Selecionado</p>
+        <div id="client_display_name" class="text-orange-500 font-black text-lg truncate italic uppercase tracking-tighter">
+          <% if session[:selected_client_id].present? %>
+            <%= Client.find_by(id: session[:selected_client_id])&.name %>
+          <% else %>
+            <span class="text-zinc-700">Consumidor Final</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="md:w-2/3 bg-zinc-900 border border-zinc-800 rounded-3xl flex flex-col shadow-2xl overflow-hidden">
+    <div class="p-6 border-b border-zinc-800 bg-zinc-800/30 flex justify-between items-center">
+      <h3 class="text-white font-black italic uppercase tracking-tighter">Itens do Carrinho</h3>
+      <span class="text-zinc-500 text-sm font-mono font-bold"><%= (session[:cart] || {}).values.sum %> PRODUTOS</span>
+    </div>
+
+    <div class="flex-grow overflow-y-auto p-6 custom-scrollbar">
+      <table class="w-full text-left border-separate border-spacing-y-2">
+        <thead>
+          <tr class="text-zinc-500 text-[10px] uppercase tracking-widest border-b border-zinc-800">
+            <th class="pb-2 px-2">Produto</th>
+            <th class="pb-2 text-center">Quantidade</th>
+            <th class="pb-2 text-right">Subtotal</th>
+            <th class="pb-2 text-right pr-4">Ação</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-zinc-800/50">
+          <% total_venda = 0 %>
+          <% (session[:cart] || {}).each do |product_id, qty| %>
+            <% product = @products.find { |p| p.id.to_s == product_id.to_s } || Product.find_by(id: product_id) %>
+            <% next unless product %>
+            <% subtotal = product.price * qty %>
+            <% total_venda += subtotal %>
+            <tr class="group bg-zinc-950/20 hover:bg-zinc-800/40 transition-all">
+              <td class="p-4 rounded-l-xl">
+                <p class="font-black text-zinc-100 group-hover:text-orange-400 transition-colors uppercase italic tracking-tighter"><%= product.name %></p>
+                <p class="text-[9px] text-zinc-600 font-bold italic uppercase">Cod: <%= product.id %> | Un: <%= number_to_currency(product.price) %></p>
+              </td>
+              <td class="py-4">
+                <div class="flex items-center justify-center bg-zinc-950 border border-zinc-800 rounded-xl w-28 mx-auto overflow-hidden">
+                  <%= button_to cart_add_path(barcode_or_name: product.id, quantity: -1, client_id: session[:selected_client_id]), method: :post, class: "px-3 py-1 text-zinc-600 hover:text-white font-black transition-colors" do %>-<% end %>
+                  <span class="px-3 font-mono text-white font-bold text-sm"><%= qty %></span>
+                  <%= button_to cart_add_path(barcode_or_name: product.id, quantity: 1, client_id: session[:selected_client_id]), method: :post, class: "px-3 py-1 text-zinc-600 hover:text-white font-black transition-colors" do %>+<% end %>
+                </div>
+              </td>
+              <td class="py-4 text-right font-black text-white italic whitespace-nowrap">
+                <%= number_to_currency(subtotal, unit: "R$ ", separator: ",", delimiter: ".") %>
+              </td>
+              <td class="py-4 text-right pr-4 rounded-r-xl">
+                <%= link_to cart_remove_path(id: product.id), data: { turbo_method: :delete }, class: "text-zinc-800 hover:text-red-500 transition-colors" do %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="p-8 bg-zinc-800/50 border-t border-zinc-800">
+      <%= form_with url: sales_path, method: :post do |f| %>
+        <%= f.hidden_field :client_id, id: "final_sale_client_id", value: session[:selected_client_id] %>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
+          <div class="lg:col-span-2">
+            <label class="text-zinc-500 text-[10px] font-black uppercase mb-2 block tracking-widest italic">Vincular Cliente (F2)</label>
+            <%= select_tag :client_search, options_from_collection_for_select(Client.all.order(:name), :id, :name, session[:selected_client_id]), 
+                include_blank: "CONSUMIDOR FINAL", 
+                id: "sale_client_id", 
+                class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-xl p-3 font-bold" %>
+          </div>
+          <div class="lg:col-span-2 flex items-end">
+            <p class="text-[10px] text-zinc-600 italic uppercase font-bold tracking-tighter">F10 Finalizar</p>
+          </div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row justify-between items-end gap-6">
+          <div class="grid grid-cols-3 gap-4 w-full lg:w-auto">
+            <div>
+              <label class="text-zinc-500 text-[10px] font-black uppercase mb-2 block tracking-widest italic">Pagamento</label>
+              <%= f.select :payment_method, Sale::PAYMENT_METHODS, {}, 
+                  class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-xl p-3 focus:border-orange-600 outline-none text-xs font-black uppercase italic" %>
+            </div>
+            <div>
+              <label class="text-zinc-500 text-[10px] font-black uppercase mb-2 block tracking-widest text-red-900 italic font-bold">Desconto (-)</label>
+              <%= f.number_field :discount, step: 0.01, value: 0, id: "discount_input", class: "w-full bg-zinc-950 border-2 border-zinc-800 text-red-500 rounded-xl p-3 focus:border-red-600 font-bold text-sm" %>
+            </div>
+            <div>
+              <label class="text-zinc-500 text-[10px] font-black uppercase mb-2 block tracking-widest text-green-900 italic font-bold">Acréscimo (+)</label>
+              <%= f.number_field :surcharge, step: 0.01, value: 0, id: "surcharge_input", class: "w-full bg-zinc-950 border-2 border-zinc-800 text-green-500 rounded-xl p-3 focus:border-green-600 font-bold text-sm" %>
+            </div>
+          </div>
+
+          <div class="flex items-end gap-8">
+            <div class="text-right">
+              <p class="text-zinc-500 text-[10px] font-black uppercase mb-1 italic tracking-widest">Total Líquido</p>
+              <h3 class="text-6xl font-black text-white tracking-tighter italic">
+                <span class="text-orange-500 text-2xl font-black">R$</span> 
+                <span id="display_total_venda"><%= number_with_precision(total_venda, precision: 2, separator: ",") %></span>
+              </h3>
+              <%= f.hidden_field :total, value: total_venda, id: "hidden_total_venda" %>
+              <input type="hidden" id="subtotal_base" value="<%= total_venda %>">
+            </div>
+            
+            <%= f.button class: "group bg-orange-600 hover:bg-orange-500 text-white px-12 py-6 rounded-2xl font-black text-2xl transition-all shadow-[0_0_30px_rgba(234,88,12,0.4)] italic uppercase tracking-tighter" do %>
+              FINALIZAR (F10)
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("turbo:load", function() {
+    // --- LÓGICA DE CÁLCULOS ---
+    const subtotalBase = document.getElementById('subtotal_base');
+    const discountInput = document.getElementById('discount_input');
+    const surchargeInput = document.getElementById('surcharge_input');
+    const displayTotal = document.getElementById('display_total_venda');
+    const hiddenTotal = document.getElementById('hidden_total_venda');
+
+    function calcular() {
+      if (!subtotalBase) return;
+      const sub = parseFloat(subtotalBase.value) || 0;
+      const desc = parseFloat(discountInput.value) || 0;
+      const acre = parseFloat(surchargeInput.value) || 0;
+      const totalFinal = sub - desc + acre;
+
+      if (displayTotal) {
+        displayTotal.innerText = totalFinal.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+      if (hiddenTotal) hiddenTotal.value = totalFinal.toFixed(2);
+    }
+
+    if (discountInput) discountInput.addEventListener("input", calcular);
+    if (surchargeInput) surchargeInput.addEventListener("input", calcular);
+
+    // --- TOMSELECT: CLIENTE ---
+    const clientSelect = document.getElementById('sale_client_id');
+    if (clientSelect && !clientSelect.classList.contains('tomselected')) {
+      new TomSelect(clientSelect, {
+        placeholder: "PESQUISAR CLIENTE...",
+        onChange: function(value) {
+          const clientDisplay = document.getElementById('client_display_name');
+          const bipHidden = document.getElementById('hidden_client_id_for_bip');
+          const finalHidden = document.getElementById('final_sale_client_id');
+
+          if (value === "") {
+            clientDisplay.innerHTML = '<span class="text-zinc-700">Consumidor Final</span>';
+            if(bipHidden) bipHidden.value = "";
+            if(finalHidden) finalHidden.value = "";
+          } else {
+            clientDisplay.innerText = this.getItem(value).innerText;
+            if(bipHidden) bipHidden.value = value;
+            if(finalHidden) finalHidden.value = value;
+          }
+        }
+      });
+    }
+
+    // --- TOMSELECT: PRODUTO (BUSCA INTELIGENTE) ---
+    const productSelect = document.getElementById('product_search_select');
+    if (productSelect && !productSelect.classList.contains('tomselected')) {
+      const tsProduct = new TomSelect(productSelect, {
+        placeholder: "DIGITE O NOME OU BIPE O CÓDIGO...",
+        maxOptions: 10,
+        onChange: function(value) {
+          if (value !== "") {
+            // Submete o formulário automaticamente ao selecionar
+            document.getElementById('add_product_form').submit();
+          }
+        }
+      });
+      // Foca no campo de produto ao carregar
+      tsProduct.focus();
+    }
+  });
+</script>

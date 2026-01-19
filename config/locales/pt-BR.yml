@@ -1,0 +1,20 @@
+pt-BR:
+  activerecord:
+    errors:
+      models:
+        client:
+          attributes:
+            phone:
+              invalid: "deve conter DDD e o número completo (ex: 11 99999-8888)"
+            number:
+              currency:
+                format:
+                  unit: "R$"
+                  precision: 2
+                  separator: ","
+                  delimiter: "."
+                  format: "%u %n"
+              precision:
+                format:
+                  separator: ","
+                  delimiter: "."

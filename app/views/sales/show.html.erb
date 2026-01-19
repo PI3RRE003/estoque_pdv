@@ -1,0 +1,137 @@
+<div class="thermal-receipt mx-auto bg-white p-2 text-black font-mono text-[12px] leading-tight" id="printable-receipt">
+  <div class="text-center mb-2">
+    <h2 class="font-bold text-lg uppercase leading-none">ORDEM SUPLEMENTOS</h2>
+    <p class="text-[10px]"><%= @sale.created_at.strftime("%d/%m/%Y %H:%M:%S") %></p>
+    <p class="text-[10px]">DOC: <%= @sale.id.to_s.rjust(6, '0') %></p>
+    
+    <p class="text-[9px] uppercase mt-1 border border-black inline-block px-2">
+      Atendente: <%= @sale.user&.name || "Nao identificado" %>
+    </p>
+  </div>
+
+  <div class="border-b border-dashed border-black my-2"></div>
+
+  <div class="text-[10px] mb-2 uppercase">
+    <% if @sale.client.present? %>
+      <p class="font-bold text-[11px]">CLIENTE: <%= @sale.client.name %></p>
+      <% if @sale.client.phone.present? %>
+        <p>TEL: <%= @sale.client.phone %></p>
+      <% end %>
+      <% if @sale.client.address.present? %>
+        <p class="mt-1">
+          END: <%= @sale.client.address %><br>
+          <%= @sale.client.neighborhood %> - <%= @sale.client.city %>/<%= @sale.client.state %>
+        </p>
+      <% end %>
+    <% else %>
+      <p class="italic text-center py-1">*** CONSUMIDOR FINAL ***</p>
+    <% end %>
+  </div>
+
+  <div class="border-b border-dashed border-black my-2"></div>
+
+  <table class="w-full text-[11px]">
+    <thead>
+      <tr class="text-left border-b border-black">
+        <th class="pb-1">ITEM</th>
+        <th class="pb-1 text-center">QTD</th>
+        <th class="pb-1 text-right">VALOR</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-dashed divide-gray-200">
+      <% @sale.sale_items.each do |item| %>
+        <tr>
+          <td class="py-1"><%= item.product.name.truncate(18).upcase %></td>
+          <td class="py-1 text-center"><%= item.quantity %></td>
+          <td class="py-1 text-right">
+            <%= number_to_currency(item.quantity.to_f * item.price.to_f, unit: "") %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <div class="border-b border-dashed border-black my-2"></div>
+
+  <div class="space-y-1 text-[11px]">
+    <% subtotal = @sale.sale_items.sum { |i| i.price.to_f * i.quantity.to_f } %>
+    <div class="flex justify-between">
+      <span>SUBTOTAL:</span>
+      <span><%= number_to_currency(subtotal, unit: "R$") %></span>
+    </div>
+
+    <% if @sale.discount.to_f > 0 %>
+      <div class="flex justify-between text-black"> <span>DESCONTO (-):</span>
+        <span><%= number_to_currency(@sale.discount, unit: "R$") %></span>
+      </div>
+    <% end %>
+
+    <% if @sale.surcharge.to_f > 0 %>
+      <div class="flex justify-between">
+        <span>ACRESCIMO (+):</span>
+        <span><%= number_to_currency(@sale.surcharge, unit: "R$") %></span>
+      </div>
+    <% end %>
+
+    <div class="flex justify-between font-bold text-lg pt-1 border-t border-black">
+      <span>TOTAL:</span>
+      <span><%= number_to_currency(@sale.total, unit: "R$") %></span>
+    </div>
+  </div>
+
+  <div class="border-b border-dashed border-black my-2"></div>
+
+  <div class="text-center text-[11px]">
+    <p class="font-bold uppercase">PAGAMENTO: <%= @sale.payment_method || "N/A" %></p>
+    <div class="mt-4 italic">
+      <p>Obrigado pela preferência!</p>
+      <p>Volte sempre.</p>
+    </div>
+    <div class="mt-4 text-[9px]">
+      <p>Sistema Estoque_Pro</p>
+    </div>
+  </div>
+</div>
+
+<div class="mt-10 flex gap-4 justify-center no-print pb-10">
+  <%# Este botão agora redireciona para a rota limpa de impressão %>
+  <%= link_to receipt_sale_path(@sale), class: "bg-orange-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:bg-orange-700 transition-all flex items-center gap-2" do %>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+    </svg>
+    IMPRIMIR RECIBO
+  <% end %>
+
+  <%= link_to "NOVA VENDA", new_sale_path, class: "bg-zinc-800 text-white px-8 py-3 rounded-xl font-bold hover:bg-zinc-900 transition-all" %>
+</div>
+<style>
+.thermal-receipt {
+  width: 80mm;
+  color: black !important;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { 
+    background: white !important; 
+    margin: 0 !important; 
+    padding: 0 !important; 
+    -webkit-print-color-adjust: exact;
+  }
+  @page { 
+    margin: 0; 
+    size: 80mm auto;
+  }
+  #printable-receipt { 
+    width: 80mm !important; 
+    padding: 5mm !important; 
+    box-shadow: none !important; 
+    border: none !important;
+  }
+  * { 
+    color: black !important; 
+    font-family: 'Courier New', Courier, monospace;
+  }
+}
+</style>

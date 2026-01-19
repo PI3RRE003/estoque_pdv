@@ -1,0 +1,28 @@
+<% content_for :title, "Novo Produto" %>
+
+<div class="flex flex-col items-center justify-center min-h-[80vh] py-10">
+  <div class="w-full max-w-xl bg-zinc-900 border border-zinc-800 p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
+    <%# Detalhe visual de brilho de fundo %>
+    <div class="absolute -top-24 -left-24 w-48 h-48 bg-orange-600/5 blur-[80px] rounded-full"></div>
+    
+    <div class="mb-8 text-center relative">
+      <h1 class="font-black text-4xl text-white italic tracking-tighter uppercase">
+        Novo <span class="text-orange-500">Produto</span>
+      </h1>
+      <p class="text-zinc-500 mt-2 text-sm font-medium">Preencha os dados abaixo para atualizar o estoque.</p>
+    </div>
+
+    <div class="mb-8 relative">
+      <%= render "form", product: @product %>
+    </div>
+
+    <div class="flex justify-center border-t border-zinc-800 pt-6 relative">
+      <%= link_to products_path, class: "flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-[10px] font-black uppercase tracking-[0.2em]" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Voltar ao Inventário
+      <% end %>
+    </div>
+  </div>
+</div>

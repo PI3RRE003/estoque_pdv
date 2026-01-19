@@ -1,0 +1,63 @@
+pt-BR:
+  # Mensagens do Banco de Dados (ActiveRecord)
+  activerecord:
+    errors:
+      messages:
+        record_invalid: "A validação falhou: %{errors}"
+        restrict_dependent_destroy:
+          has_one: "Não é possível excluir o registro porque existe um %{record} dependente"
+          has_many: "Não é possível excluir o registro porque existem %{record} dependentes"
+    models:
+      user:
+        attributes:
+          username:
+            taken: "já está em uso. Escolha outro nome de login."
+            blank: "não pode ficar em branco."
+          name:
+            blank: "deve ser preenchido."
+          password:
+            blank: "não pode ficar em branco."
+            too_short: "é muito curta (mínimo de 6 caracteres)."
+            confirmation: "não coincide com a confirmação."
+
+  # Mensagens do Sistema de Login (Devise)
+  devise:
+    failure:
+      unauthenticated: "Para continuar, faça login ou registre-se."
+      unconfirmed: "Antes de continuar, confirme a sua conta."
+      invalid: "Usuário ou senha inválidos."
+      last_attempt: "Você tem mais uma tentativa antes de sua conta ser bloqueada."
+      already_authenticated: "Você já está logado no sistema."
+      not_found_in_database: "Usuário ou senha inválidos."
+      locked: "A sua conta está bloqueada."
+      timeout: "Sua sessão expirou. Por favor, faça login novamente para continuar."
+    sessions:
+      signed_in: "Bem-vindo! Login efetuado com sucesso."
+      signed_out: "Até logo! Você saiu do sistema."
+      already_signed_out: "Saiu com sucesso."
+    passwords:
+      updated: "Sua senha foi alterada com sucesso."
+      no_token: "Você só pode acessar esta página através de um e-mail de redefinição de senha."
+      send_instructions: "Dentro de instantes você receberá um e-mail com instruções de como redefinir sua senha."
+      updated_not_active: "Sua senha foi alterada com sucesso."
+    registrations:
+      signed_up: "Cadastro realizado com sucesso."
+      updated: "Sua conta foi atualizada com sucesso."
+      destroyed: "Sua conta foi excluída. Esperamos vê-lo novamente em breve."
+
+  # Mensagens Gerais de Erro
+  errors:
+    messages:
+      already_confirmed: "já foi confirmado, por favor tente efetuar login"
+      confirmation: "não corresponde à confirmação"
+      empty: "não pode ficar vazio"
+      blank: "não pode ficar em branco"
+      too_long: "é muito longo (máximo de %{count} caracteres)"
+      too_short: "é muito curto (mínimo de %{count} caracteres)"
+      wrong_length: "não possui o comprimento esperado (%{count} caracteres)"
+      not_a_number: "não é um número"
+      not_an_integer: "não é um número inteiro"
+      greater_than: "deve ser maior que %{count}"
+      equal_to: "deve ser igual a %{count}"
+      less_than: "deve ser menor que %{count}"
+      taken: "já está em uso"

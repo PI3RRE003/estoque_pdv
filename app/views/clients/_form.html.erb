@@ -1,0 +1,123 @@
+<%= form_with(model: client, class: "space-y-6") do |f| %>
+  <% if client.errors.any? %>
+    <div class="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl text-xs italic">
+      <h2 class="font-bold uppercase mb-2"><%= pluralize(client.errors.count, "erro") %> impediram o salvamento:</h2>
+      <ul class="list-disc pl-5">
+        <% client.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="md:col-span-2">
+      <%= f.label :name, "Nome Completo", class: "text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-2 block" %>
+      <%= f.text_field :name, placeholder: "Ex: João Silva", class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-xl p-3 focus:border-orange-600 outline-none transition-all placeholder:text-zinc-800" %>
+    </div>
+
+    <div>
+      <%= f.label :cpf, "CPF", class: "text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-2 block" %>
+      <%= f.text_field :cpf, id: "cpf_field", placeholder: "000.000.000-00", class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-xl p-3 focus:border-orange-600 outline-none transition-all placeholder:text-zinc-800" %>
+    </div>
+
+    <div>
+      <%= f.label :phone, "Telefone / Celular", class: "text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-2 block" %>
+      <%= f.text_field :phone, id: "phone_field", placeholder: "(00) 00000-0000", class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-xl p-3 focus:border-orange-600 outline-none transition-all placeholder:text-zinc-800" %>
+    </div>
+
+    <div class="md:col-span-2">
+      <%= f.label :zipcode, "CEP (Busca Automática)", class: "text-orange-500 text-[10px] font-bold uppercase tracking-widest mb-2 block" %>
+      <%= f.text_field :zipcode, id: "zipcode_field", placeholder: "00000-000", class: "w-full bg-zinc-950 border-2 border-orange-900/30 text-white rounded-xl p-3 focus:border-orange-600 outline-none transition-all placeholder:text-zinc-800" %>
+    </div>
+
+    <div class="md:col-span-1">
+      <%= f.label :address, "Logradouro (Rua/Av)", class: "text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-2 block" %>
+      <%= f.text_field :address, id: "address_field", class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-xl p-3 focus:border-orange-600 outline-none transition-all" %>
+    </div>
+
+    <div class="md:col-span-1">
+      <%= f.label :neighborhood, "Bairro", class: "text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-2 block" %>
+      <%= f.text_field :neighborhood, id: "neighborhood_field", class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-xl p-3 focus:border-orange-600 outline-none transition-all" %>
+    </div>
+
+    <div class="md:col-span-1">
+      <%= f.label :city, "Cidade", class: "text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-2 block" %>
+      <%= f.text_field :city, id: "city_field", class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-xl p-3 focus:border-orange-600 outline-none transition-all" %>
+    </div>
+
+    <div class="md:col-span-1">
+      <%= f.label :state, "UF", class: "text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-2 block" %>
+      <%= f.text_field :state, id: "state_field", class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-xl p-3 focus:border-orange-600 outline-none transition-all" %>
+    </div>
+  </div>
+
+  <div class="pt-6">
+    <%= f.submit "Salvar Alterações", class: "w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-4 rounded-xl shadow-lg transition-all cursor-pointer uppercase italic tracking-tighter" %>
+  </div>
+<% end %>
+
+<script>
+  document.addEventListener("turbo:load", function() {
+    // 1. MÁSCARA DE CPF
+    const cpfField = document.getElementById('cpf_field');
+    if (cpfField) {
+      cpfField.addEventListener('input', (e) => {
+        let v = e.target.value.replace(/\D/g, "");
+        if (v.length > 11) v = v.substring(0, 11);
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+        e.target.value = v;
+      });
+    }
+
+    // 2. MÁSCARA DE TELEFONE
+    const phoneField = document.getElementById('phone_field');
+    if (phoneField) {
+      phoneField.addEventListener('input', (e) => {
+        let v = e.target.value.replace(/\D/g, ""); // Remove tudo que não é dígito
+        
+        if (v.length > 11) v = v.substring(0, 11); // Limita a 11 dígitos
+
+        if (v.length > 10) {
+          // Padrão Celular: (11) 98888-7777
+          v = v.replace(/^(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+        } else if (v.length > 5) {
+          // Padrão Fixo: (11) 4444-3333
+          v = v.replace(/^(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+        } else if (v.length > 2) {
+          v = v.replace(/^(\d{2})(\d+)/, "($1) $2");
+        }
+        
+        e.target.value = v;
+      });
+    }
+
+    // 3. BUSCA DE CEP + MÁSCARA
+    const zipcodeField = document.getElementById('zipcode_field');
+    if (zipcodeField) {
+      zipcodeField.addEventListener('input', (e) => {
+        let v = e.target.value.replace(/\D/g, "");
+        v = v.replace(/^(\d{5})(\d)/, "$1-$2");
+        e.target.value = v;
+      });
+
+      zipcodeField.addEventListener('blur', function() {
+        const cep = this.value.replace(/\D/g, '');
+        if (cep.length === 8) {
+          fetch(`https://viacep.com.br/ws/${cep}/json/`)
+            .then(res => res.json())
+            .then(data => {
+              if (!data.erro) {
+                document.getElementById('address_field').value = data.logradouro;
+                document.getElementById('neighborhood_field').value = data.bairro;
+                document.getElementById('city_field').value = data.localidade;
+                document.getElementById('state_field').value = data.uf;
+              }
+            });
+        }
+      });
+    }
+  });
+</script>

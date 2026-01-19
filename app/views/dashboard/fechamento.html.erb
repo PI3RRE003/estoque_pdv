@@ -1,0 +1,29 @@
+<div style="width: 58mm; font-family: monospace; font-size: 12px; color: black; background: white; padding: 10px;"></div>
+  <center>
+    <h2 style="margin: 0;">FECHAMENTO</h2>
+    <p><%= Time.zone.now.strftime("%d/%m/%Y %H:%M") %></p>
+  </center>
+  <hr border-style="dashed">
+  
+  <p><b>Vendas realizadas:</b> <%= @sales_today.count %></p>
+  
+  <p><b>Produtos vendidos:</b></p>
+  <% @products_sold.each do |name, qty| %>
+    <div style="display: flex; justify-content: space-between;">
+      <span><%= name.truncate(15) %></span>
+      <span>x<%= qty %></span>
+    </div>
+  <% end %>
+  
+  <hr border-style="dashed">
+  <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: bold;">
+    <span>TOTAL GERAL:</span>
+    <span><%= number_to_currency(@total_revenue, unit: "R$") %></span>
+  </div>
+  
+  <center style="margin-top: 20px;">
+    <p>--- FIM DO RELATÓRIO ---</p>
+  </center>
+</div>
+
+<script>window.print();</script>

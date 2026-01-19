@@ -1,0 +1,27 @@
+<div class="flex flex-col items-center justify-center min-h-[80vh] py-10">
+  <div class="w-full max-w-2xl bg-zinc-900 border border-zinc-800 p-10 rounded-3xl shadow-2xl">
+    
+    <div class="mb-10 text-center">
+      <div class="inline-block p-3 bg-orange-500/10 rounded-2xl mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+        </svg>
+      </div>
+      <h1 class="font-black text-4xl text-white italic tracking-tighter uppercase">
+        Novo <span class="text-orange-500">Cliente</span>
+      </h1>
+      <p class="text-zinc-500 mt-2 text-sm">Cadastre os dados para faturamento e entregas.</p>
+    </div>
+
+    <%= render "form", client: @client %>
+
+    <div class="flex justify-center border-t border-zinc-800 mt-8 pt-6">
+      <%= link_to clients_path, class: "flex items-center gap-2 text-zinc-600 hover:text-white transition-all text-[10px] font-black uppercase tracking-[0.2em]" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Cancelar e Voltar
+      <% end %>
+    </div>
+  </div>
+</div>

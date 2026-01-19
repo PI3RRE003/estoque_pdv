@@ -1,0 +1,92 @@
+<% content_for :title, "Perfil do Cliente" %>
+
+<div class="max-w-4xl mx-auto">
+  <% if notice.present? %>
+    <div class="mb-6 p-4 bg-green-500/10 border border-green-500/20 text-green-500 rounded-2xl flex items-center gap-3 animate-bounce">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+      </svg>
+      <span class="font-bold text-sm uppercase tracking-wide"><%= notice %></span>
+    </div>
+  <% end %>
+
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div>
+      <h1 class="text-4xl font-black text-white italic tracking-tighter uppercase">Detalhes do <span class="text-orange-500">Cliente</span></h1>
+      <p class="text-zinc-500 text-sm">Informações cadastrais e histórico.</p>
+    </div>
+    
+    <div class="flex gap-2">
+      <%= link_to edit_client_path(@client), class: "bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-3 px-6 rounded-xl transition-all flex items-center gap-2" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        EDITAR
+      <% end %>
+      <%= link_to clients_path, class: "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white font-bold py-3 px-6 rounded-xl transition-all" do %>
+        VOLTAR
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="md:col-span-1 space-y-6">
+      <div class="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl text-center shadow-2xl">
+        <div class="w-20 h-20 bg-orange-600 rounded-full mx-auto flex items-center justify-center text-white text-3xl font-black mb-4 shadow-[0_0_30px_rgba(234,88,12,0.3)]">
+          <%= @client.name[0].upcase %>
+        </div>
+        <h2 class="text-white font-black text-xl truncate"><%= @client.name %></h2>
+        <p class="text-zinc-500 text-xs font-mono mt-1"><%= @client.cpf.present? ? @client.cpf : "CPF não informado" %></p>
+      </div>
+
+      <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-3xl shadow-xl border-t-4 border-t-orange-600">
+        <h3 class="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-4 italic">Total de Compras</h3>
+        <p class="text-white font-black text-2xl"><%= @client.sales.count %></p>
+        <p class="text-zinc-600 text-[10px] uppercase mt-1">Vendas realizadas</p>
+      </div>
+
+      <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-3xl shadow-xl opacity-80 hover:opacity-100 transition-opacity">
+        <h3 class="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-4">Ações Críticas</h3>
+        <%= button_to @client, method: :delete, class: "w-full bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white text-xs font-black py-3 rounded-xl transition-all border border-red-500/20", data: { turbo_confirm: "Tem certeza que deseja excluir este cliente?" } do %>
+          EXCLUIR CADASTRO
+        <% end %>
+      </div>
+    </div>
+
+    <div class="md:col-span-2">
+      <div class="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl h-full">
+        <div class="p-6 bg-zinc-800/30 border-b border-zinc-800 flex justify-between items-center">
+          <h3 class="text-white font-bold text-sm uppercase tracking-widest">Informações de Contato e Endereço</h3>
+          <span class="px-3 py-1 bg-orange-600/10 text-orange-500 text-[10px] font-bold rounded-full border border-orange-500/20">ATIVO</span>
+        </div>
+        
+        <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <label class="text-zinc-600 text-[10px] font-bold uppercase tracking-widest block mb-1">Telefone</label>
+            <p class="text-zinc-200 font-medium text-lg"><%= @client.phone.present? ? @client.phone : "Não cadastrado" %></p>
+          </div>
+          
+          <div>
+            <label class="text-zinc-600 text-[10px] font-bold uppercase tracking-widest block mb-1">CEP</label>
+            <p class="text-zinc-200 font-mono text-lg"><%= @client.zipcode %></p>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="text-zinc-600 text-[10px] font-bold uppercase tracking-widest block mb-1">Logradouro (Rua/Av)</label>
+            <p class="text-zinc-200 text-lg"><%= @client.address %></p>
+          </div>
+
+          <div>
+            <label class="text-zinc-600 text-[10px] font-bold uppercase tracking-widest block mb-1">Bairro</label>
+            <p class="text-zinc-200 text-lg"><%= @client.neighborhood %></p>
+          </div>
+
+          <div>
+            <label class="text-zinc-600 text-[10px] font-bold uppercase tracking-widest block mb-1">Cidade / UF</label>
+            <p class="text-zinc-200 text-lg"><%= @client.city %> - <%= @client.state %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

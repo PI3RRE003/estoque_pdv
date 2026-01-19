@@ -1,0 +1,35 @@
+<% content_for :title, "Editar Cliente" %>
+
+<div class="flex flex-col items-center justify-center min-h-[80vh] py-10">
+  <div class="w-full max-w-2xl bg-zinc-900 border border-zinc-800 p-10 rounded-3xl shadow-2xl">
+    
+    <div class="mb-10 text-center">
+      <div class="inline-block p-3 bg-blue-500/10 rounded-2xl mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+      </div>
+      <h1 class="font-black text-4xl text-white italic tracking-tighter uppercase">
+        Editar <span class="text-orange-500">Cliente</span>
+      </h1>
+      <p class="text-zinc-500 mt-2 text-sm">Atualize os dados cadastrais de <strong><%= @client.name %></strong></p>
+    </div>
+
+    <%= render "form", client: @client %>
+
+    <div class="flex flex-col sm:flex-row justify-center items-center gap-4 border-t border-zinc-800 mt-8 pt-6">
+      <%= link_to @client, class: "flex items-center gap-2 text-zinc-500 hover:text-white transition-all text-[10px] font-black uppercase tracking-[0.2em]" do %>
+        Visualizar Perfil
+      <% end %>
+      
+      <span class="hidden sm:block text-zinc-800">|</span>
+
+      <%= link_to clients_path, class: "flex items-center gap-2 text-zinc-600 hover:text-white transition-all text-[10px] font-black uppercase tracking-[0.2em]" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Voltar para Lista
+      <% end %>
+    </div>
+  </div>
+</div>

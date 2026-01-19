@@ -1,0 +1,50 @@
+<%= form_with(model: product, class: "space-y-5") do |f| %>
+  <% if product.errors.any? %>
+    <div class="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-2xl text-xs mb-6">
+      <p class="font-black uppercase mb-1">Erro ao salvar:</p>
+      <ul class="list-disc pl-5 font-medium">
+        <% product.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :name, "NOME DO PRODUTO", class: "text-zinc-500 text-[10px] font-black tracking-widest ml-2 mb-2 block" %>
+    <%= f.text_field :name, placeholder: "Ex: Coca-Cola 2L", class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-2xl p-4 focus:border-orange-600 outline-none transition-all font-bold" %>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div class="col-span-2 md:col-span-1">
+      <%= f.label :barcode, "CÓDIGO DE BARRAS", class: "text-zinc-500 text-[10px] font-black tracking-widest ml-2 mb-2 block" %>
+      <%= f.text_field :barcode, placeholder: "Bipar código...", class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-2xl p-4 focus:border-orange-600 outline-none transition-all font-mono" %>
+    </div>
+    <div class="col-span-2 md:col-span-1">
+      <%= f.label :stock_quantity, "QTD EM ESTOQUE", class: "text-zinc-500 text-[10px] font-black tracking-widest ml-2 mb-2 block" %>
+      <%= f.number_field :stock_quantity, class: "w-full bg-zinc-950 border-2 border-zinc-800 text-orange-500 rounded-2xl p-4 focus:border-orange-600 outline-none transition-all font-black" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <%= f.label :price_cost, "PREÇO DE CUSTO (R$)", class: "text-zinc-500 text-[10px] font-black tracking-widest ml-2 mb-2 block" %>
+      <%# Usamos value para garantir a exibição com vírgula na edição %>
+      <%= f.text_field :price_cost, 
+          value: number_with_precision(f.object.price_cost, precision: 2, separator: ','),
+          placeholder: "0,00",
+          class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-2xl p-4 focus:border-orange-600 outline-none transition-all font-bold" %>
+    </div>
+    <div>
+      <%= f.label :price, "PREÇO DE VENDA (R$)", class: "text-zinc-500 text-[10px] font-black tracking-widest ml-2 mb-2 block" %>
+      <%= f.text_field :price, 
+          value: number_with_precision(f.object.price, precision: 2, separator: ','),
+          placeholder: "0,00",
+          class: "w-full bg-zinc-950 border-2 border-zinc-800 text-green-500 rounded-2xl p-4 focus:border-green-600 outline-none transition-all font-black" %>
+    </div>
+  </div>
+
+  <div class="pt-4">
+    <%= f.submit "CADASTRAR PRODUTO", class: "w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-5 rounded-2xl shadow-xl transition-all cursor-pointer uppercase italic tracking-tighter text-lg" %>
+  </div>
+<% end %>

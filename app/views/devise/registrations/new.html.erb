@@ -1,0 +1,73 @@
+<div class="min-h-screen flex items-center justify-center bg-black p-6">
+  <div class="w-full max-w-md bg-zinc-900 border border-zinc-800 p-10 rounded-[2.5rem] shadow-2xl">
+    <div class="text-center mb-10">
+      <h1 class="text-4xl font-black text-white italic uppercase tracking-tighter">
+        Novo <span class="text-orange-500">Vendedor</span>
+      </h1>
+      <p class="text-zinc-500 text-[10px] font-bold mt-2 uppercase tracking-widest">Cadastrar operador de caixa</p>
+    </div>
+
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-5" }) do |f| %>
+      <%# Mensagens de Erro %>
+      <% if resource.errors.any? %>
+        <div class="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-2xl text-xs mb-4">
+          <ul class="list-disc pl-4 font-bold uppercase tracking-tighter">
+            <% resource.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div>
+        <%= f.label :name, "NOME COMPLETO", class: "text-zinc-500 text-[10px] font-black ml-2 mb-2 block tracking-widest" %>
+        <%= f.text_field :name, autofocus: true, class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-2xl p-4 focus:border-orange-600 outline-none transition-all font-bold" %>
+      </div>
+
+      <div>
+        <%= f.label :username, "NOME DE USUÁRIO (LOGIN)", class: "text-zinc-500 text-[10px] font-black ml-2 mb-2 block tracking-widest" %>
+        <%= f.text_field :username, id: "user_username_input", class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-2xl p-4 focus:border-orange-600 outline-none transition-all font-bold uppercase" %>
+        
+        <%# CAMPO OCULTO PARA SATISFAZER O DEVISE %>
+        <%= f.hidden_field :email, id: "user_email_hidden" %>
+      </div>
+
+      <div>
+        <%= f.label :role, "NÍVEL DE ACESSO", class: "text-zinc-500 text-[10px] font-black ml-2 mb-2 block tracking-widest" %>
+        <%= f.select :role, User.roles.keys.map { |role| [role.titleize, role] }, {}, class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-2xl p-4 focus:border-orange-600 outline-none transition-all font-bold" %>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <%= f.label :password, "SENHA", class: "text-zinc-500 text-[10px] font-black ml-2 mb-2 block tracking-widest" %>
+          <%= f.password_field :password, class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-2xl p-4 focus:border-orange-600 outline-none transition-all" %>
+        </div>
+
+        <div>
+          <%= f.label :password_confirmation, "CONFIRMAR", class: "text-zinc-500 text-[10px] font-black ml-2 mb-2 block tracking-widest" %>
+          <%= f.password_field :password_confirmation, class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-2xl p-4 focus:border-orange-600 outline-none transition-all" %>
+        </div>
+      </div>
+
+      <div class="pt-4">
+        <%= f.submit "FINALIZAR CADASTRO", class: "w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-5 rounded-2xl shadow-xl transition-all cursor-pointer uppercase italic tracking-tighter text-lg active:scale-95" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  // Lógica para preencher o e-mail automaticamente e evitar erros do Devise
+  document.addEventListener("turbo:load", function() {
+    const usernameInput = document.getElementById('user_username_input');
+    const emailHidden = document.getElementById('user_email_hidden');
+
+    if (usernameInput && emailHidden) {
+      usernameInput.addEventListener('input', function() {
+        const value = usernameInput.value.toLowerCase().replace(/\s+/g, '');
+        // Gera um email fictício técnico: usuario@terminal.local
+        emailHidden.value = value + "@terminal.local";
+      });
+    }
+  });
+</script>

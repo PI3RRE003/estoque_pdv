@@ -1,0 +1,35 @@
+<div class="flex justify-between items-center mb-8">
+  <h1 class="text-3xl font-black text-white italic uppercase tracking-tighter">Gestão de <span class="text-orange-500">Equipe</span></h1>
+  <%= link_to "NOVO VENDEDOR", new_user_path, class: "bg-orange-600 hover:bg-orange-500 text-white font-black py-3 px-6 rounded-xl transition-all" %>
+</div>
+
+<div class="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl">
+  <table class="w-full text-left">
+    <thead>
+      <tr class="bg-zinc-800/50 text-zinc-500 text-[10px] uppercase tracking-widest border-b border-zinc-800">
+        <th class="p-6">Nome</th>
+        <th class="p-6">E-mail</th>
+        <th class="p-6">Cargo</th>
+        <th class="p-6 text-right">Ações</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-zinc-800">
+      <% @users.each do |user| %>
+        <tr class="hover:bg-zinc-800/30 transition-colors">
+          <td class="p-6 font-bold text-white"><%= user.name %></td>
+          <td class="p-6 text-zinc-400"><%= user.email %></td>
+          <td class="p-6">
+            <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase <%= user.admin? ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20' : 'bg-zinc-800 text-zinc-500' %>">
+              <%= user.role %>
+            </span>
+          </td>
+          <td class="p-6 text-right">
+            <% unless user == current_user %>
+              <%= link_to "Remover", user_path(user), data: { turbo_method: :delete, turbo_confirm: "Tem certeza?" }, class: "text-red-500 hover:text-red-400 text-xs font-bold" %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,65 @@
+<% content_for :title, "Novo Vendedor" %>
+
+<div class="flex flex-col items-center justify-center min-h-[80vh] py-6">
+  <div class="w-full max-w-lg bg-zinc-900 border border-zinc-800 p-10 rounded-[2.5rem] shadow-2xl">
+    
+    <div class="text-center mb-10">
+      <div class="inline-block p-4 bg-orange-600/10 rounded-2xl mb-4 border border-orange-500/20">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+        </svg>
+      </div>
+      <h1 class="text-3xl font-black text-white italic tracking-tighter uppercase">Novo <span class="text-orange-500">Vendedor</span></h1>
+      <p class="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mt-2">Crie o acesso para o seu colaborador</p>
+    </div>
+
+    <%# ERROS %>
+    <% if @user.errors.any? %>
+      <div class="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl mb-6 text-xs italic">
+        <ul class="list-disc pl-5 uppercase font-bold tracking-tighter">
+          <% @user.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%# FORMULÁRIO BLINDADO - Aponta para /vendedores %>
+    <%= form_with scope: :user, url: "/vendedores", method: :post, local: true, data: { turbo: false }, class: "space-y-6" do |f| %>
+      
+      <div class="space-y-2">
+        <%= f.label :name, "Nome Completo", class: "block text-zinc-500 text-[10px] font-bold uppercase tracking-widest ml-1" %>
+        <%= f.text_field :name, placeholder: "Ex: João Silva", required: true, class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-2xl p-4 focus:border-orange-600 outline-none transition-all placeholder:text-zinc-800 font-bold" %>
+      </div>
+
+      <div class="space-y-2">
+        <%= f.label :username, "Login de Acesso", class: "block text-zinc-500 text-[10px] font-bold uppercase tracking-widest ml-1" %>
+        <%= f.text_field :username, placeholder: "Ex: joao.caixa", required: true, class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-2xl p-4 focus:border-orange-600 outline-none transition-all placeholder:text-zinc-800 font-bold uppercase" %>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-2">
+          <%= f.label :password, "Senha", class: "block text-zinc-500 text-[10px] font-bold uppercase tracking-widest ml-1" %>
+          <%= f.password_field :password, required: true, class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-2xl p-4 focus:border-orange-600 outline-none transition-all" %>
+        </div>
+        <div class="space-y-2">
+          <%= f.label :password_confirmation, "Confirmação", class: "block text-zinc-500 text-[10px] font-bold uppercase tracking-widest ml-1" %>
+          <%= f.password_field :password_confirmation, required: true, class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-2xl p-4 focus:border-orange-600 outline-none transition-all" %>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <%= f.label :role, "Nível de Acesso", class: "block text-zinc-500 text-[10px] font-bold uppercase tracking-widest ml-1" %>
+        <%= f.select :role, User.roles.keys.map { |r| [r.titleize, r] }, {}, class: "w-full bg-zinc-950 border-2 border-zinc-800 text-white rounded-2xl p-4 focus:border-orange-600 outline-none transition-all font-bold text-sm uppercase" %>
+      </div>
+
+      <div class="pt-4">
+        <%= f.submit "SALVAR VENDEDOR", class: "w-full bg-orange-600 hover:bg-orange-500 text-white font-black py-4 rounded-2xl shadow-lg transition-all cursor-pointer uppercase italic tracking-tighter active:scale-95" %>
+      </div>
+    <% end %>
+
+    <div class="mt-8 text-center border-t border-zinc-800/50 pt-6">
+      <%= link_to "VOLTAR PARA LISTA", users_path, class: "text-zinc-600 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest" %>
+    </div>
+  </div>
+</div>
