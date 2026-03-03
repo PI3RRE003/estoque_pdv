@@ -5,30 +5,38 @@ class DashboardController < ApplicationController
     @end_date = params[:end_date].present? ? params[:end_date].to_date.end_of_day : Time.zone.now.end_of_day
     @range = @start_date..@end_date
 
-    # 2. Vendas no período selecionado
+    # 2. Vendas no período (FATURAMENTO REAL = Total - Descontos)
     @sales_selected = Sale.where(created_at: @range)
-    @revenue_today = @sales_selected.sum(:total)
     @sales_count = @sales_selected.count
 
-    # 3. Lucro no período (Ajustado para 'price_cost' que é o seu campo oficial)
-    @profit_today = SaleItem.joins(:sale, :product)
-                            .where(sales: { created_at: @range })
-                            .sum("sale_items.quantity * (sale_items.price - products.price_cost)") rescue 0
+    # AJUSTE: Subtrai o desconto do faturamento bruto
+    @revenue_today = @sales_selected.sum(:total).to_f - @sales_selected.sum(:discount).to_f
 
-    # 4. Meios de pagamento no período
+    # 3. LUCRO REAL (Preço de Venda - Preço de Custo - Descontos)
+    # Calculamos o lucro bruto dos itens e subtraímos os descontos totais aplicados nas vendas
+    profit_from_items = SaleItem.joins(:sale, :product)
+                                .where(sales: { created_at: @range })
+                                .sum("sale_items.quantity * (sale_items.price - products.price_cost)").to_f
+
+    total_discounts = @sales_selected.sum(:discount).to_f
+    @profit_today = profit_from_items - total_discounts
+
+    # 4. Meios de pagamento
     @sales_by_payment = @sales_selected.group(:payment_method).count
 
-    # 5. Dados para o Gráfico (Lógica nativa para evitar dependência de gems extras)
-    @sales_by_day = @sales_selected.group("DATE(sales.created_at)").sum(:total)
+    # 5. Dados para o Gráfico (Ajustado para faturamento líquido)
+    # Aqui fazemos uma soma que já considera o desconto por dia
+    @sales_by_day = @sales_selected.group("DATE(sales.created_at)")
+                                   .sum("sales.total - sales.discount")
 
-    # 6. Estoque baixo (Ajustado para o seu campo oficial: 'stock_quantity')
+    # 6. Estoque baixo
     @low_stock_products = Product.where("stock_quantity < ?", 10).order(:stock_quantity).limit(10)
 
-    # 7. Ranking de Vendedores
+    # 7. Ranking de Vendedores (Ajustado para faturamento líquido)
     @top_sellers = User.joins(:sales)
                        .where(sales: { created_at: @range })
-                       .group("users.id", "users.name") # Adicionado users.name para compatibilidade com SQL
-                       .select("users.name, sum(sales.total) as total_sold")
+                       .group("users.id", "users.name")
+                       .select("users.name, sum(sales.total - sales.discount) as total_sold")
                        .order("total_sold DESC")
   end
 
@@ -37,7 +45,8 @@ class DashboardController < ApplicationController
     @range = @date.beginning_of_day..@date.end_of_day
 
     @sales_today = Sale.where(created_at: @range)
-    @total_revenue = @sales_today.sum(:total)
+    # Ajuste no fechamento para faturamento líquido
+    @total_revenue = @sales_today.sum(:total).to_f - @sales_today.sum(:discount).to_f
 
     @products_sold = SaleItem.where(sale_id: @sales_today.pluck(:id))
                              .joins(:product)

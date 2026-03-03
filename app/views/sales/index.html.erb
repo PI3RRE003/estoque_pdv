@@ -14,8 +14,12 @@
       <div class="absolute -right-4 -top-4 w-24 h-24 bg-orange-600/10 blur-3xl rounded-full"></div>
       <p class="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-1 italic">Total no Período</p>
       <h2 class="text-3xl font-black text-white italic tracking-tighter">
-        <%= number_to_currency(@sales.sum(:total), unit: "R$ ", separator: ",", delimiter: ".") %>
+        <%= number_to_currency(@sales.to_a.sum(&:total), unit: "R$ ", separator: ",", delimiter: ".") %>
+        <p class="text-white text-xs">Vendas somadas: <%= @sales.count %></p>
       </h2>
+      <% if params[:start_date].present? || params[:end_date].present? %>
+        <span class="text-[8px] text-orange-500 font-bold uppercase tracking-widest mt-1">Filtro Ativo</span>
+      <% end %>
     </div>
     
     <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-3xl shadow-xl">
